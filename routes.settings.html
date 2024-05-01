@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Settings Routes &#8212; Aggie&#39;s House  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Database" href="database.html" />
+    <link rel="prev" title="Questionnaire Routes" href="routes.questionnaire.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="database.html" title="Database"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="routes.questionnaire.html" title="Questionnaire Routes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Settings Routes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-routes.settings.routes">
+<span id="settings-routes"></span><h1>Settings Routes<a class="headerlink" href="#module-routes.settings.routes" title="Link to this heading">¶</a></h1>
+<p>Endpoints used for the edit profile page.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.settings.routes.change_active_status">
+<span class="sig-prename descclassname"><span class="pre">routes.settings.routes.</span></span><span class="sig-name descname"><span class="pre">change_active_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/settings/routes.html#change_active_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.settings.routes.change_active_status" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to toggle the active status of the current user (deactivate/reactivate a user).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON object confirming the successful status change.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.settings.routes.check_active_status">
+<span class="sig-prename descclassname"><span class="pre">routes.settings.routes.</span></span><span class="sig-name descname"><span class="pre">check_active_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/settings/routes.html#check_active_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.settings.routes.check_active_status" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to check the active status of the current user (whether the user is deactivated or not).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON object indicating whether the user is active or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.settings.routes.delete_account">
+<span class="sig-prename descclassname"><span class="pre">routes.settings.routes.</span></span><span class="sig-name descname"><span class="pre">delete_account</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/settings/routes.html#delete_account"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.settings.routes.delete_account" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to delete the current user’s account.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON object indicating the success of the deletion process.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.settings.routes.delete_categories">
+<span class="sig-prename descclassname"><span class="pre">routes.settings.routes.</span></span><span class="sig-name descname"><span class="pre">delete_categories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/settings/routes.html#delete_categories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.settings.routes.delete_categories" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to delete all answers associated with selected categories for the current user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>categories</strong> (<em>list</em>) – A list of category IDs to delete answers from.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response
+A JSON object confirming the deletion of answers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.settings.routes.edit_answers">
+<span class="sig-prename descclassname"><span class="pre">routes.settings.routes.</span></span><span class="sig-name descname"><span class="pre">edit_answers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/settings/routes.html#edit_answers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.settings.routes.edit_answers" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to edit user answers for questions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request.json</strong> (<em>dict</em>) – A JSON object containing the updated answers keyed by question IDs.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response
+A JSON response indicating the success or failure of the operation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.settings.routes.get_category_id">
+<span class="sig-prename descclassname"><span class="pre">routes.settings.routes.</span></span><span class="sig-name descname"><span class="pre">get_category_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/settings/routes.html#get_category_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.settings.routes.get_category_id" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to retrieve the category ID based on the provided category name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response containing the category ID if found, or an error message if not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.settings.routes.get_current_categories">
+<span class="sig-prename descclassname"><span class="pre">routes.settings.routes.</span></span><span class="sig-name descname"><span class="pre">get_current_categories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/settings/routes.html#get_current_categories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.settings.routes.get_current_categories" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to retrieve categories with at least one answer from the current user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON object containing the IDs and names of categories with at least one answer from the current user.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.settings.routes.get_empty_categories">
+<span class="sig-prename descclassname"><span class="pre">routes.settings.routes.</span></span><span class="sig-name descname"><span class="pre">get_empty_categories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/settings/routes.html#get_empty_categories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.settings.routes.get_empty_categories" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to retrieve categories with no answers from the current user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON object containing the IDs and names of categories with no answers from the current user.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Settings Routes</a><ul>
+<li><a class="reference internal" href="#routes.settings.routes.change_active_status"><code class="docutils literal notranslate"><span class="pre">change_active_status()</span></code></a></li>
+<li><a class="reference internal" href="#routes.settings.routes.check_active_status"><code class="docutils literal notranslate"><span class="pre">check_active_status()</span></code></a></li>
+<li><a class="reference internal" href="#routes.settings.routes.delete_account"><code class="docutils literal notranslate"><span class="pre">delete_account()</span></code></a></li>
+<li><a class="reference internal" href="#routes.settings.routes.delete_categories"><code class="docutils literal notranslate"><span class="pre">delete_categories()</span></code></a></li>
+<li><a class="reference internal" href="#routes.settings.routes.edit_answers"><code class="docutils literal notranslate"><span class="pre">edit_answers()</span></code></a></li>
+<li><a class="reference internal" href="#routes.settings.routes.get_category_id"><code class="docutils literal notranslate"><span class="pre">get_category_id()</span></code></a></li>
+<li><a class="reference internal" href="#routes.settings.routes.get_current_categories"><code class="docutils literal notranslate"><span class="pre">get_current_categories()</span></code></a></li>
+<li><a class="reference internal" href="#routes.settings.routes.get_empty_categories"><code class="docutils literal notranslate"><span class="pre">get_empty_categories()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="routes.questionnaire.html"
+                          title="previous chapter">Questionnaire Routes</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="database.html"
+                          title="next chapter">Database</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/routes.settings.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="database.html" title="Database"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="routes.questionnaire.html" title="Questionnaire Routes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Settings Routes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Hunter Zacha, Michelle Nguyen, Navya Mittal, Harini Kumar.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

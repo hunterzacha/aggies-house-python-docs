@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Feed Routes &#8212; Aggie&#39;s House  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Matches Routes" href="routes.matches.html" />
+    <link rel="prev" title="Chat Routes" href="routes.chat.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="routes.matches.html" title="Matches Routes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="routes.chat.html" title="Chat Routes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Feed Routes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-routes.feed.routes">
+<span id="feed-routes"></span><h1>Feed Routes<a class="headerlink" href="#module-routes.feed.routes" title="Link to this heading">¶</a></h1>
+<p>Endpoints used for the feed.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.feed.routes.calculate_age">
+<span class="sig-prename descclassname"><span class="pre">routes.feed.routes.</span></span><span class="sig-name descname"><span class="pre">calculate_age</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">birthday</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/feed/routes.html#calculate_age"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.feed.routes.calculate_age" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate age based on the provided birthday.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>birthday</strong> (<em>date</em>) – The date of birth of the user.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int or None
+The calculated age of the user, or None if the birthday is not provided.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.feed.routes.check_for_match">
+<span class="sig-prename descclassname"><span class="pre">routes.feed.routes.</span></span><span class="sig-name descname"><span class="pre">check_for_match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id_2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/feed/routes.html#check_for_match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.feed.routes.check_for_match" title="Link to this definition">¶</a></dt>
+<dd><p>Check if two users have mutually liked each other.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id_1</strong> (<em>int</em>) – The ID of the first user.</p></li>
+<li><p><strong>user_id_2</strong> (<em>int</em>) – The ID of the second user.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool
+True if both users have liked each other, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.feed.routes.compare_users_to_current">
+<span class="sig-prename descclassname"><span class="pre">routes.feed.routes.</span></span><span class="sig-name descname"><span class="pre">compare_users_to_current</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">users</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/feed/routes.html#compare_users_to_current"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.feed.routes.compare_users_to_current" title="Link to this definition">¶</a></dt>
+<dd><p>Compare current user to other users based on various attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>current_user</strong> (<a class="reference internal" href="database.html#database.User" title="database.User"><em>User</em></a>) – The current user for comparison.</p></li>
+<li><p><strong>users</strong> (<em>list</em>) – List of User objects to compare against.</p></li>
+<li><p><strong>age_similarity_weight</strong> (<em>float</em>) – Weight for age similarity comparison.</p></li>
+<li><p><strong>bio_similarity_weight</strong> (<em>float</em>) – Weight for biography similarity comparison.</p></li>
+<li><p><strong>major_similarity_weight</strong> (<em>float</em>) – Weight for major similarity comparison.</p></li>
+<li><p><strong>gender_similarity_weight</strong> (<em>float</em>) – Weight for gender similarity comparison.</p></li>
+<li><p><strong>answer_similarity_weight</strong> (<em>float</em>) – Weight for answer similarity comparison.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list
+A list of tuples containing user IDs and their overall similarity scores compared to the current user.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.feed.routes.dislike">
+<span class="sig-prename descclassname"><span class="pre">routes.feed.routes.</span></span><span class="sig-name descname"><span class="pre">dislike</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/feed/routes.html#dislike"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.feed.routes.dislike" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to dislike another user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>liked_user_id</strong> (<em>int</em>) – The ID of the user being disliked.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response
+A JSON response indicating that the dislike was successful.
+- message (str): A message indicating the result of the dislike operation.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the request does not contain JSON data.</p></li>
+<li><p><strong>ValueError</strong> – If either the user ID or the liked user ID is missing from the request.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.feed.routes.getfeed">
+<span class="sig-prename descclassname"><span class="pre">routes.feed.routes.</span></span><span class="sig-name descname"><span class="pre">getfeed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/feed/routes.html#getfeed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.feed.routes.getfeed" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to fetch the feed of potential matches for the current user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response containing a list of user IDs representing potential matches.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the current user is not authenticated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.feed.routes.like">
+<span class="sig-prename descclassname"><span class="pre">routes.feed.routes.</span></span><span class="sig-name descname"><span class="pre">like</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/feed/routes.html#like"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.feed.routes.like" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to like another user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>liked_user_id</strong> (<em>int</em>) – The ID of the user being liked.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response
+A JSON response indicating whether the like was successful and if it resulted in a match.
+- message (str): A message indicating the result of the like operation.
+- match (bool): Indicates whether the like resulted in a match.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the request does not contain JSON data.</p></li>
+<li><p><strong>ValueError</strong> – If either the user ID or the liked user ID is missing from the request.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.feed.routes.unmatch">
+<span class="sig-prename descclassname"><span class="pre">routes.feed.routes.</span></span><span class="sig-name descname"><span class="pre">unmatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matched_user_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/feed/routes.html#unmatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.feed.routes.unmatch" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to unmatch with a previously matched user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>matched_user_id</strong> (<em>int</em>) – The ID of the user to unmatch.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response
+A JSON response indicating whether the unmatch was successful.
+- message (str): A message indicating the result of the unmatch operation.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the method is not POST.</p></li>
+<li><p><strong>ValueError</strong> – If no matching entry is found for the current user and the matched user.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.feed.routes.userinfo">
+<span class="sig-prename descclassname"><span class="pre">routes.feed.routes.</span></span><span class="sig-name descname"><span class="pre">userinfo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/feed/routes.html#userinfo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.feed.routes.userinfo" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to retrieve user information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<em>int</em>) – The ID of the user whose information is requested.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response
+A JSON response containing the user’s information.
+- first_name (str): The user’s first name.
+- age (int): The user’s age.
+- major (str): The user’s major.
+- bio (str): The user’s biography.
+- categories (dict): A dictionary containing categories and their corresponding answered questions.
+- photos (list): A list of URLs to the user’s photos.
+- gender (str): The user’s gender.
+- verified (bool): Whether the user is verified.
+- email (str): The user’s email.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If no user ID is provided or if the user is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Feed Routes</a><ul>
+<li><a class="reference internal" href="#routes.feed.routes.calculate_age"><code class="docutils literal notranslate"><span class="pre">calculate_age()</span></code></a></li>
+<li><a class="reference internal" href="#routes.feed.routes.check_for_match"><code class="docutils literal notranslate"><span class="pre">check_for_match()</span></code></a></li>
+<li><a class="reference internal" href="#routes.feed.routes.compare_users_to_current"><code class="docutils literal notranslate"><span class="pre">compare_users_to_current()</span></code></a></li>
+<li><a class="reference internal" href="#routes.feed.routes.dislike"><code class="docutils literal notranslate"><span class="pre">dislike()</span></code></a></li>
+<li><a class="reference internal" href="#routes.feed.routes.getfeed"><code class="docutils literal notranslate"><span class="pre">getfeed()</span></code></a></li>
+<li><a class="reference internal" href="#routes.feed.routes.like"><code class="docutils literal notranslate"><span class="pre">like()</span></code></a></li>
+<li><a class="reference internal" href="#routes.feed.routes.unmatch"><code class="docutils literal notranslate"><span class="pre">unmatch()</span></code></a></li>
+<li><a class="reference internal" href="#routes.feed.routes.userinfo"><code class="docutils literal notranslate"><span class="pre">userinfo()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="routes.chat.html"
+                          title="previous chapter">Chat Routes</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="routes.matches.html"
+                          title="next chapter">Matches Routes</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/routes.feed.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="routes.matches.html" title="Matches Routes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="routes.chat.html" title="Chat Routes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Feed Routes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Hunter Zacha, Michelle Nguyen, Navya Mittal, Harini Kumar.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>testusers &#8212; Aggie&#39;s House  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
+    
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">testusers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for testusers</h1><div class="highlight"><pre>
+<span></span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">File used to generate test users.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">database</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">choice</span><span class="p">,</span> <span class="n">randint</span><span class="p">,</span> <span class="n">sample</span>
+<span class="kn">from</span> <span class="nn">test_data</span> <span class="kn">import</span> <span class="n">first_names</span><span class="p">,</span> <span class="n">major_options</span><span class="p">,</span> <span class="n">photos</span><span class="p">,</span> <span class="n">categories_and_questions</span>
+
+<div class="viewcode-block" id="load_test_data">
+<a class="viewcode-back" href="../testusers.html#testusers.load_test_data">[docs]</a>
+<span class="k">def</span> <span class="nf">load_test_data</span><span class="p">(</span><span class="n">db</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load test data into the database.</span>
+
+<span class="sd">    :param db: SQLAlchemy database session</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Start date for birthdays</span>
+    <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">1995</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># End date for birthdays</span>
+    <span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="n">first_name</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">first_names</span><span class="p">)</span>
+        <span class="n">random_days</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">start_date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span><span class="p">)</span>
+        <span class="n">birthday</span> <span class="o">=</span> <span class="n">start_date</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">random_days</span><span class="p">)</span>
+        <span class="n">gender</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="s2">&quot;Male&quot;</span><span class="p">,</span> <span class="s2">&quot;Female&quot;</span><span class="p">,</span> <span class="s2">&quot;Non-binary&quot;</span><span class="p">])</span>
+        <span class="n">major</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">major_options</span><span class="p">)</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;example</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">@example.com&quot;</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span>
+        <span class="n">profile_photo</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">photos</span><span class="p">)</span>
+        <span class="n">bio</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Hi, I am </span><span class="si">{</span><span class="n">first_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">verified</span> <span class="o">=</span> <span class="n">choice</span><span class="p">([</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+        <span class="c1"># if verified:</span>
+        <span class="c1">#     tamuEmail = f&quot;example{i}@tamu.edu&quot;</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     tamuEmail = None</span>
+
+        <span class="c1"># Create user object</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+            <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="n">first_name</span><span class="p">,</span>
+            <span class="n">birthday</span><span class="o">=</span><span class="n">birthday</span><span class="p">,</span>
+            <span class="n">gender</span><span class="o">=</span><span class="n">gender</span><span class="p">,</span>
+            <span class="n">major</span><span class="o">=</span><span class="n">major</span><span class="p">,</span>
+            <span class="n">profile_photo</span><span class="o">=</span><span class="n">profile_photo</span><span class="p">,</span>
+            <span class="n">bio</span><span class="o">=</span><span class="n">bio</span><span class="p">,</span>
+            <span class="n">verified</span> <span class="o">=</span> <span class="n">verified</span>
+            <span class="c1"># tamuEmail=tamuEmail</span>
+        <span class="p">)</span>
+        
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="n">chat_engine_url</span> <span class="o">=</span> <span class="s1">&#39;https://api.chatengine.io/users/&#39;</span>
+        <span class="n">chat_engine_private_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;CHAT_ENGINE_PRIVATE_KEY&#39;</span><span class="p">)</span>  <span class="c1"># Replace with your Chat Engine private key</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;PRIVATE-KEY&#39;</span><span class="p">:</span> <span class="n">chat_engine_private_key</span><span class="p">}</span>
+        <span class="n">chat_engine_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>  <span class="c1"># Using email as username for simplicity, you can adjust this as needed</span>
+            <span class="s2">&quot;secret&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>  <span class="c1"># Using password as secret for simplicity, ensure it&#39;s secure in production</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="s2">&quot;first_name&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+            <span class="c1"># Add other fields as needed</span>
+        <span class="p">}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">chat_engine_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">chat_engine_data</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>  <span class="c1"># Raise exception if request fails</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="c1"># Commit all users to the database</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+        <span class="n">photo1</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">photo_url</span><span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">photos</span><span class="p">))</span>
+        <span class="n">photo2</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">photo_url</span><span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">photos</span><span class="p">))</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">photo1</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">photo2</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">category_name</span><span class="p">,</span> <span class="n">questions</span> <span class="ow">in</span> <span class="n">categories_and_questions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="n">Category</span><span class="p">(</span><span class="n">category_name</span><span class="o">=</span><span class="n">category_name</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">question_data</span> <span class="ow">in</span> <span class="n">questions</span><span class="p">:</span>
+            <span class="n">question_text</span> <span class="o">=</span> <span class="n">question_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">)</span>
+            <span class="n">question_type</span> <span class="o">=</span> <span class="n">question_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="n">question_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;options&quot;</span><span class="p">)</span>
+            <span class="n">question</span> <span class="o">=</span> <span class="n">Question</span><span class="p">(</span><span class="n">category_id</span><span class="o">=</span><span class="n">category</span><span class="o">.</span><span class="n">category_id</span><span class="p">,</span> <span class="n">question_text</span><span class="o">=</span><span class="n">question_text</span><span class="p">,</span> <span class="n">question_type</span><span class="o">=</span><span class="n">question_type</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">options</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="n">answer_choice</span> <span class="o">=</span> <span class="n">Answer_Choice</span><span class="p">(</span><span class="n">question_id</span><span class="o">=</span><span class="n">question</span><span class="o">.</span><span class="n">question_id</span><span class="p">,</span> <span class="n">choice_text</span><span class="o">=</span><span class="n">option</span><span class="p">)</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">answer_choice</span><span class="p">)</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">question_type</span> <span class="o">==</span> <span class="s2">&quot;multiple choice&quot;</span> <span class="ow">and</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="n">answer_text</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+                    <span class="n">answer</span> <span class="o">=</span> <span class="n">Answer</span><span class="p">(</span><span class="n">question_id</span><span class="o">=</span><span class="n">question</span><span class="o">.</span><span class="n">question_id</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">answer_text</span><span class="o">=</span><span class="n">answer_text</span><span class="p">)</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+                <span class="c1">#randomly select between 1 and n options</span>
+                <span class="k">elif</span> <span class="n">question_type</span> <span class="o">==</span> <span class="s2">&quot;multi select&quot;</span> <span class="ow">and</span> <span class="n">options</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+                        <span class="n">num_selected</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">num_selected</span> <span class="o">=</span> <span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">options</span><span class="p">))</span>
+                    <span class="n">selected_answers</span> <span class="o">=</span> <span class="n">sample</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">num_selected</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">selected_answer</span> <span class="ow">in</span> <span class="n">selected_answers</span><span class="p">:</span>
+                        <span class="n">answer</span> <span class="o">=</span> <span class="n">Answer</span><span class="p">(</span><span class="n">question_id</span><span class="o">=</span><span class="n">question</span><span class="o">.</span><span class="n">question_id</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">answer_text</span><span class="o">=</span><span class="n">selected_answer</span><span class="p">)</span>
+                        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">answer_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="si">}</span><span class="s2"> sample answer&quot;</span>
+                    <span class="n">answer</span> <span class="o">=</span> <span class="n">Answer</span><span class="p">(</span><span class="n">question_id</span><span class="o">=</span><span class="n">question</span><span class="o">.</span><span class="n">question_id</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">answer_text</span><span class="o">=</span><span class="n">answer_text</span><span class="p">)</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+    <span class="c1">#For testing matches</span>
+    <span class="n">test_user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">user_id</span> <span class="o">!=</span> <span class="n">test_user</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">user</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">like</span> <span class="o">=</span> <span class="n">Like</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">liked_user_id</span><span class="o">=</span><span class="n">test_user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">liked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">like</span><span class="p">)</span>
+            <span class="n">match_like</span> <span class="o">=</span> <span class="n">Like</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">test_user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">liked_user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">liked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">match_like</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    
+    
+
+    <span class="c1">#Test user profile for incomplete info</span>
+    <span class="n">incomplete_user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+        <span class="n">email</span><span class="o">=</span><span class="s2">&quot;incomplete@example.com&quot;</span><span class="p">,</span>
+        <span class="n">password</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
+        <span class="n">first_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">birthday</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gender</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">major</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">profile_photo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bio</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verified</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># tamuEmail=tamuEmail</span>
+    <span class="p">)</span>
+
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">incomplete_user</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">testusers</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Aggie&#39;s House Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

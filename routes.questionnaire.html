@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Questionnaire Routes &#8212; Aggie&#39;s House  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Settings Routes" href="routes.settings.html" />
+    <link rel="prev" title="Login Routes" href="routes.login.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="routes.settings.html" title="Settings Routes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="routes.login.html" title="Login Routes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Questionnaire Routes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-routes.questionnaire.routes">
+<span id="questionnaire-routes"></span><h1>Questionnaire Routes<a class="headerlink" href="#module-routes.questionnaire.routes" title="Link to this heading">¶</a></h1>
+<p>Endpoints used for the questionnaire.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.questionnaire.routes.get_profile_info">
+<span class="sig-prename descclassname"><span class="pre">routes.questionnaire.routes.</span></span><span class="sig-name descname"><span class="pre">get_profile_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/questionnaire/routes.html#get_profile_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.questionnaire.routes.get_profile_info" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to retrieve profile information of the logged-in user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response containing the user’s profile information.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.questionnaire.routes.get_questions_by_category">
+<span class="sig-prename descclassname"><span class="pre">routes.questionnaire.routes.</span></span><span class="sig-name descname"><span class="pre">get_questions_by_category</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/questionnaire/routes.html#get_questions_by_category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.questionnaire.routes.get_questions_by_category" title="Link to this definition">¶</a></dt>
+<dd><p>Get questions by category ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>category_id</strong> (<em>int</em>) – The ID of the category.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response
+A JSON response containing questions and their answer choices.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.questionnaire.routes.get_user_answers_by_category">
+<span class="sig-prename descclassname"><span class="pre">routes.questionnaire.routes.</span></span><span class="sig-name descname"><span class="pre">get_user_answers_by_category</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/questionnaire/routes.html#get_user_answers_by_category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.questionnaire.routes.get_user_answers_by_category" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to retrieve user answers by category ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>category_id</strong> (<em>int</em>) – The ID of the category.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response
+A JSON response containing user answers for questions in the specified category.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.questionnaire.routes.get_user_id">
+<span class="sig-prename descclassname"><span class="pre">routes.questionnaire.routes.</span></span><span class="sig-name descname"><span class="pre">get_user_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/questionnaire/routes.html#get_user_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.questionnaire.routes.get_user_id" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to retrieve the user ID from the session.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response containing the user ID if found, or an error message if not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.questionnaire.routes.save_answers">
+<span class="sig-prename descclassname"><span class="pre">routes.questionnaire.routes.</span></span><span class="sig-name descname"><span class="pre">save_answers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/questionnaire/routes.html#save_answers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.questionnaire.routes.save_answers" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to save user answers to questions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response indicating the success of saving the answers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.questionnaire.routes.update_profile_info">
+<span class="sig-prename descclassname"><span class="pre">routes.questionnaire.routes.</span></span><span class="sig-name descname"><span class="pre">update_profile_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/questionnaire/routes.html#update_profile_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.questionnaire.routes.update_profile_info" title="Link to this definition">¶</a></dt>
+<dd><p>Endpoint to update the profile information of the logged-in user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response indicating the success or failure of the profile update.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Questionnaire Routes</a><ul>
+<li><a class="reference internal" href="#routes.questionnaire.routes.get_profile_info"><code class="docutils literal notranslate"><span class="pre">get_profile_info()</span></code></a></li>
+<li><a class="reference internal" href="#routes.questionnaire.routes.get_questions_by_category"><code class="docutils literal notranslate"><span class="pre">get_questions_by_category()</span></code></a></li>
+<li><a class="reference internal" href="#routes.questionnaire.routes.get_user_answers_by_category"><code class="docutils literal notranslate"><span class="pre">get_user_answers_by_category()</span></code></a></li>
+<li><a class="reference internal" href="#routes.questionnaire.routes.get_user_id"><code class="docutils literal notranslate"><span class="pre">get_user_id()</span></code></a></li>
+<li><a class="reference internal" href="#routes.questionnaire.routes.save_answers"><code class="docutils literal notranslate"><span class="pre">save_answers()</span></code></a></li>
+<li><a class="reference internal" href="#routes.questionnaire.routes.update_profile_info"><code class="docutils literal notranslate"><span class="pre">update_profile_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="routes.login.html"
+                          title="previous chapter">Login Routes</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="routes.settings.html"
+                          title="next chapter">Settings Routes</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/routes.questionnaire.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="routes.settings.html" title="Settings Routes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="routes.login.html" title="Login Routes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Questionnaire Routes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Hunter Zacha, Michelle Nguyen, Navya Mittal, Harini Kumar.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>
