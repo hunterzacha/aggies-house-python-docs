@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Login Routes &#8212; Aggie&#39;s House  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Questionnaire Routes" href="routes.questionnaire.html" />
+    <link rel="prev" title="Images Routes" href="routes.images.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="routes.questionnaire.html" title="Questionnaire Routes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="routes.images.html" title="Images Routes"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Login Routes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-routes.login.routes">
+<span id="login-routes"></span><h1>Login Routes<a class="headerlink" href="#module-routes.login.routes" title="Link to this heading">¶</a></h1>
+<p>Endpoints used for login.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.login.routes.check_profile_status">
+<span class="sig-prename descclassname"><span class="pre">routes.login.routes.</span></span><span class="sig-name descname"><span class="pre">check_profile_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/login/routes.html#check_profile_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.login.routes.check_profile_status" title="Link to this definition">¶</a></dt>
+<dd><p>Check the profile completion status of the current user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response containing the profile completion status.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.login.routes.gauthorize">
+<span class="sig-prename descclassname"><span class="pre">routes.login.routes.</span></span><span class="sig-name descname"><span class="pre">gauthorize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/login/routes.html#gauthorize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.login.routes.gauthorize" title="Link to this definition">¶</a></dt>
+<dd><p>Authorize a Google login request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response indicating the success or failure of the login attempt.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.login.routes.get_majors">
+<span class="sig-prename descclassname"><span class="pre">routes.login.routes.</span></span><span class="sig-name descname"><span class="pre">get_majors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/login/routes.html#get_majors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.login.routes.get_majors" title="Link to this definition">¶</a></dt>
+<dd><p>Gets a list of available majors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response containing the list of majors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.login.routes.login">
+<span class="sig-prename descclassname"><span class="pre">routes.login.routes.</span></span><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/login/routes.html#login"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.login.routes.login" title="Link to this definition">¶</a></dt>
+<dd><p>Log in a user with email and password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response indicating the success or failure of the login attempt.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.login.routes.logout_user">
+<span class="sig-prename descclassname"><span class="pre">routes.login.routes.</span></span><span class="sig-name descname"><span class="pre">logout_user</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/login/routes.html#logout_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.login.routes.logout_user" title="Link to this definition">¶</a></dt>
+<dd><p>Log out the current user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response indicating the success or failure of the logout attempt.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.login.routes.signup">
+<span class="sig-prename descclassname"><span class="pre">routes.login.routes.</span></span><span class="sig-name descname"><span class="pre">signup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/login/routes.html#signup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.login.routes.signup" title="Link to this definition">¶</a></dt>
+<dd><p>Register a new user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response
+A JSON response indicating the success or failure of the sign-up attempt.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="routes.login.routes.verify_google_token">
+<span class="sig-prename descclassname"><span class="pre">routes.login.routes.</span></span><span class="sig-name descname"><span class="pre">verify_google_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">access_token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/routes/login/routes.html#verify_google_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#routes.login.routes.verify_google_token" title="Link to this definition">¶</a></dt>
+<dd><p>Verify a Google token using Authlib.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>access_token</strong> (<em>str</em>) – The access token to verify.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict or None
+A dictionary containing user information if verification is successful, 
+None otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Login Routes</a><ul>
+<li><a class="reference internal" href="#routes.login.routes.check_profile_status"><code class="docutils literal notranslate"><span class="pre">check_profile_status()</span></code></a></li>
+<li><a class="reference internal" href="#routes.login.routes.gauthorize"><code class="docutils literal notranslate"><span class="pre">gauthorize()</span></code></a></li>
+<li><a class="reference internal" href="#routes.login.routes.get_majors"><code class="docutils literal notranslate"><span class="pre">get_majors()</span></code></a></li>
+<li><a class="reference internal" href="#routes.login.routes.login"><code class="docutils literal notranslate"><span class="pre">login()</span></code></a></li>
+<li><a class="reference internal" href="#routes.login.routes.logout_user"><code class="docutils literal notranslate"><span class="pre">logout_user()</span></code></a></li>
+<li><a class="reference internal" href="#routes.login.routes.signup"><code class="docutils literal notranslate"><span class="pre">signup()</span></code></a></li>
+<li><a class="reference internal" href="#routes.login.routes.verify_google_token"><code class="docutils literal notranslate"><span class="pre">verify_google_token()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="routes.images.html"
+                          title="previous chapter">Images Routes</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="routes.questionnaire.html"
+                          title="next chapter">Questionnaire Routes</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/routes.login.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="routes.questionnaire.html" title="Questionnaire Routes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="routes.images.html" title="Images Routes"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Login Routes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Hunter Zacha, Michelle Nguyen, Navya Mittal, Harini Kumar.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>routes.images.routes &#8212; Aggie&#39;s House  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=def86cc0" />
+    
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">routes.images.routes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for routes.images.routes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Endpoints used for image display and submission.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">send_file</span>
+<span class="kn">from</span> <span class="nn">database</span> <span class="kn">import</span> <span class="n">db</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">User_Photo</span>
+<span class="kn">from</span> <span class="nn">werkzeug.utils</span> <span class="kn">import</span> <span class="n">secure_filename</span>
+<span class="kn">from</span> <span class="nn">werkzeug.datastructures</span> <span class="kn">import</span> <span class="n">FileStorage</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="c1">#remove later</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="c1"># from run import s3, s3_bucket, aws_region</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span>
+
+<span class="n">image_bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;images&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_profile_images">
+<a class="viewcode-back" href="../../../routes.images.html#routes.images.routes.get_profile_images">[docs]</a>
+<span class="nd">@image_bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/photos&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">get_profile_images</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Retrieve profile images associated with the current user from AWS bucket.</span>
+
+<span class="sd">    :return: Response</span>
+<span class="sd">        A JSON response containing the URLs of the user&#39;s profile photos.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+    <span class="n">photos</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">photo_urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">photo</span><span class="o">.</span><span class="n">photo_url</span> <span class="k">for</span> <span class="n">photo</span> <span class="ow">in</span> <span class="n">photos</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span><span class="p">:</span>
+        <span class="n">photo_urls</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">photo_url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">photo_urls</span><span class="p">):</span>
+        <span class="c1">#generate presigned link for photos in aws bucket</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;production&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">photo_url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;aggies_house_&#39;</span><span class="p">):</span>
+                <span class="n">s3_link</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">generate_presigned_url</span><span class="p">(</span>
+                    <span class="s1">&#39;get_object&#39;</span><span class="p">,</span>
+                    <span class="n">Params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Bucket&#39;</span><span class="p">:</span> <span class="n">s3_bucket</span><span class="p">,</span> <span class="s1">&#39;Key&#39;</span><span class="p">:</span> <span class="n">photo_url</span><span class="p">},</span>
+                    <span class="n">ExpiresIn</span><span class="o">=</span><span class="mi">300</span>  <span class="c1"># URL expires in 1 hour</span>
+                <span class="p">)</span>
+                <span class="n">photo_urls</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">s3_link</span>
+
+
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;user_photos&#39;</span><span class="p">:</span> <span class="n">photo_urls</span><span class="p">}),</span> <span class="mi">200</span></div>
+
+
+<div class="viewcode-block" id="save_profile_images">
+<a class="viewcode-back" href="../../../routes.images.html#routes.images.routes.save_profile_images">[docs]</a>
+<span class="nd">@image_bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/photos/upload&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">save_profile_images</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save profile images associated with the current user.</span>
+
+<span class="sd">    :return: Response</span>
+<span class="sd">        A JSON response indicating whether the files were successfully uploaded.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user_id</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;User not logged in&#39;</span><span class="p">}),</span> <span class="mi">401</span>
+
+
+    <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;User not found&#39;</span><span class="p">}),</span> <span class="mi">404</span>
+
+    <span class="n">images</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;images[]&#39;</span><span class="p">)</span>
+    <span class="n">urls</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;urls[]&#39;</span><span class="p">)</span>
+    <span class="n">urlIdxs</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;urlIndexes[]&#39;</span><span class="p">)</span>
+    <span class="n">imageIdxs</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;imageIndexes[]&#39;</span><span class="p">)</span>
+
+    <span class="c1">#merge into single array to keep proper ordering</span>
+    <span class="n">total_photos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">urlIdxs</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">imageIdxs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">total_photos</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;No photos sent&#39;</span><span class="p">}),</span> <span class="mi">400</span>
+
+    <span class="n">photos_arr</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">total_photos</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">images</span><span class="p">):</span>
+        <span class="n">image_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">imageIdxs</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="n">photos_arr</span><span class="p">[</span><span class="n">image_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">image</span>
+
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">urls</span><span class="p">):</span>
+        <span class="n">url_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">urlIdxs</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="c1">#for aws links, we want to keep just the file name</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;https://s3.</span><span class="si">{</span><span class="n">aws_region</span><span class="si">}</span><span class="s1">.amazonaws.com/</span><span class="si">{</span><span class="n">s3_bucket</span><span class="si">}</span><span class="s1">/&#39;</span><span class="p">):</span>
+            <span class="n">photos_arr</span><span class="p">[</span><span class="n">url_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">extract_filename_from_presigned_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">photos_arr</span><span class="p">[</span><span class="n">url_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">url</span>
+
+    <span class="c1">#create a set of photos that the user kept</span>
+    <span class="n">keep_photos_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">photo</span> <span class="ow">in</span> <span class="n">photos_arr</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">photo</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+           <span class="n">keep_photos_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;development&#39;</span><span class="p">:</span>
+        <span class="c1">#find out the current photos the user has</span>
+        <span class="n">current_photos</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">current_photos</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span><span class="p">)</span>
+
+        <span class="c1">#remove photos that aren&#39;t kept by user from the db and files</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">photo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_photos</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">photo</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep_photos_set</span><span class="p">:</span>
+                <span class="c1">#for profile photos, remove current</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;test_images/aggies_house_&#39;</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">photo</span><span class="o">.</span><span class="n">photo_url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep_photos_set</span><span class="p">:</span>
+                <span class="c1">#for non-profile photos, delete the current photo from directory a</span>
+                <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">photo_url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;test_images/aggies_house_&#39;</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">photo</span><span class="o">.</span><span class="n">photo_url</span><span class="p">)</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    
+        <span class="c1"># add new images back to db</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">photos_arr</span><span class="p">):</span>
+            <span class="n">upload_photo_local</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># #find out the current photos the user has</span>
+        <span class="c1"># current_photos = User_Photo.query.filter_by(user_id=user.user_id).all()</span>
+        <span class="c1"># current_photos.insert(0,user.profile_photo)</span>
+
+        <span class="c1"># #remove old photos that aren&#39;t kept by user and remove all old user_photos</span>
+        <span class="c1"># for index, photo in enumerate(current_photos):</span>
+        <span class="c1">#     if index == 0 and photo not in keep_photos_set:</span>
+        <span class="c1">#         #for profile photos, remove current</span>
+        <span class="c1">#         user.user_photo = None</span>
+        <span class="c1">#         if photo.startswith(&#39;aggies_house_&#39;):</span>
+        <span class="c1">#             s3.delete_object(Bucket=s3_bucket, Key=photo)</span>
+        <span class="c1">#     elif index == 0:</span>
+        <span class="c1">#         pass</span>
+        <span class="c1">#     elif photo.photo_url not in keep_photos_set:</span>
+        <span class="c1">#         #for non-profile photos, delete the current photo from directory a</span>
+        <span class="c1">#         if photo.photo_url.startswith(&#39;aggies_house_&#39;):</span>
+        <span class="c1">#             s3.delete_object(Bucket=s3_bucket, Key=photo.photo_url)</span>
+        <span class="c1">#         db.session.delete(photo)</span>
+        <span class="c1">#     elif index &gt; 0:</span>
+        <span class="c1">#         db.session.delete(photo)</span>
+
+        <span class="c1"># db.session.commit()</span>
+    
+        <span class="c1"># # add images back to db</span>
+        <span class="c1"># for index, image in enumerate(photos_arr):</span>
+        <span class="c1">#     upload_photo_aws(user, image, index)</span>
+
+    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;production&#39;</span><span class="p">:</span>
+        <span class="c1">#find out the current photos the user has</span>
+        <span class="n">current_photos</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">current_photos</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span><span class="p">)</span>
+
+        <span class="c1">#remove old photos that aren&#39;t kept by user and remove all old user_photos</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">photo</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_photos</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">photo</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep_photos_set</span><span class="p">:</span>
+                <span class="c1">#for profile photos, remove current</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">user_photo</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;aggies_house_&#39;</span><span class="p">):</span>
+                    <span class="n">s3</span><span class="o">.</span><span class="n">delete_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">photo</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">photo</span><span class="o">.</span><span class="n">photo_url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep_photos_set</span><span class="p">:</span>
+                <span class="c1">#for non-profile photos, delete the current photo from directory a</span>
+                <span class="k">if</span> <span class="n">photo</span><span class="o">.</span><span class="n">photo_url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;aggies_house_&#39;</span><span class="p">):</span>
+                    <span class="n">s3</span><span class="o">.</span><span class="n">delete_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">s3_bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">photo</span><span class="o">.</span><span class="n">photo_url</span><span class="p">)</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">photo</span><span class="p">)</span>
+
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    
+        <span class="c1"># add images back to db</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">image</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">photos_arr</span><span class="p">):</span>
+            <span class="n">upload_photo_aws</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        
+    <span class="n">saved_files</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">saved_files</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Files successfully uploaded&#39;</span><span class="p">}),</span> <span class="mi">200</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Failed to upload files&#39;</span><span class="p">}),</span> <span class="mi">500</span></div>
+
+
+<div class="viewcode-block" id="allowed_file">
+<a class="viewcode-back" href="../../../routes.images.html#routes.images.routes.allowed_file">[docs]</a>
+<span class="k">def</span> <span class="nf">allowed_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a file has an allowed extension.</span>
+
+<span class="sd">    :param str filename: The name of the file to check.</span>
+
+<span class="sd">    :return: bool</span>
+<span class="sd">        True if the file has an allowed extension, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ALLOWED_EXTENSIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="s1">&#39;jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;jpeg&#39;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">filename</span> <span class="ow">and</span> <span class="n">filename</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">ALLOWED_EXTENSIONS</span></div>
+
+
+<div class="viewcode-block" id="upload_photo_local">
+<a class="viewcode-back" href="../../../routes.images.html#routes.images.routes.upload_photo_local">[docs]</a>
+<span class="k">def</span> <span class="nf">upload_photo_local</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Upload a photo locally or set it as the user&#39;s profile photo.</span>
+
+<span class="sd">    :param User user: The user for whom the photo is being uploaded.</span>
+<span class="sd">    :param str or FileStorage image: The image to upload.</span>
+<span class="sd">    :param int index: The index of the image in the array of photos.</span>
+
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_photo</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">photo_url</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_photo</span><span class="p">)</span>      
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">FileStorage</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">allowed_file</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">original_filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">original_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">original_filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">hash_value</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;test_images/aggies_house_</span><span class="si">{</span><span class="n">hash_value</span><span class="si">}{</span><span class="n">original_extension</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">new_photo</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">photo_url</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_photo</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">allowed_file</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">original_filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">original_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">original_filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">hash_value</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;test_images/aggies_house_</span><span class="si">{</span><span class="n">hash_value</span><span class="si">}{</span><span class="n">original_extension</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span> <span class="o">=</span> <span class="n">file_path</span></div>
+
+
+<div class="viewcode-block" id="upload_photo_aws">
+<a class="viewcode-back" href="../../../routes.images.html#routes.images.routes.upload_photo_aws">[docs]</a>
+<span class="k">def</span> <span class="nf">upload_photo_aws</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="n">image</span><span class="p">,</span><span class="n">index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Upload a photo to AWS S3 or set it as the user&#39;s profile photo.</span>
+
+<span class="sd">    :param User user: The user for whom the photo is being uploaded.</span>
+<span class="sd">    :param str or FileStorage image: The image to upload.</span>
+<span class="sd">    :param int index: The index of the image in the array of photos.</span>
+
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_photo</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">photo_url</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_photo</span><span class="p">)</span>      
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">FileStorage</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">allowed_file</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">original_filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">original_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">original_filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">hash_value</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;aggies_house_</span><span class="si">{</span><span class="n">hash_value</span><span class="si">}{</span><span class="n">original_extension</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">s3</span><span class="o">.</span><span class="n">upload_fileobj</span><span class="p">(</span>
+                <span class="n">image</span><span class="p">,</span>
+                <span class="n">s3_bucket</span><span class="p">,</span>
+                <span class="n">file_path</span>
+            <span class="p">)</span>
+            <span class="n">new_photo</span> <span class="o">=</span> <span class="n">User_Photo</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">photo_url</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">new_photo</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">allowed_file</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">original_filename</span> <span class="o">=</span> <span class="n">secure_filename</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">original_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">original_filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">hash_value</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;aggies_house_</span><span class="si">{</span><span class="n">hash_value</span><span class="si">}{</span><span class="n">original_extension</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">s3</span><span class="o">.</span><span class="n">upload_fileobj</span><span class="p">(</span>
+                <span class="n">image</span><span class="p">,</span>
+                <span class="n">s3_bucket</span><span class="p">,</span>
+                <span class="n">file_path</span>
+            <span class="p">)</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">profile_photo</span> <span class="o">=</span> <span class="n">file_path</span></div>
+
+
+<div class="viewcode-block" id="extract_filename_from_presigned_url">
+<a class="viewcode-back" href="../../../routes.images.html#routes.images.routes.extract_filename_from_presigned_url">[docs]</a>
+<span class="k">def</span> <span class="nf">extract_filename_from_presigned_url</span><span class="p">(</span><span class="n">presigned_url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract the filename from a presigned URL.</span>
+
+<span class="sd">    :param str presigned_url: The presigned URL from which to extract the filename.</span>
+
+<span class="sd">    :return: str</span>
+<span class="sd">        The extracted filename.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">presigned_url</span><span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span>
+    
+    <span class="n">object_key</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">unquote</span><span class="p">(</span><span class="n">object_key</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">filename</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">routes.images.routes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Aggie&#39;s House Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>
