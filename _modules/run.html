@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>run &#8212; Aggie&#39;s House  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=def86cc0" />
+    
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">run</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for run</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Initializes Flask App, DB, registers routes blueprints, initializes OAuth Client, and initializes S3 client.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">send_from_directory</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">session</span>
+<span class="kn">from</span> <span class="nn">flask_cors</span> <span class="kn">import</span> <span class="n">CORS</span><span class="p">,</span> <span class="n">cross_origin</span>
+<span class="kn">from</span> <span class="nn">dotenv</span> <span class="kn">import</span> <span class="n">load_dotenv</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy_utils</span> <span class="kn">import</span> <span class="n">database_exists</span><span class="p">,</span> <span class="n">create_database</span>
+<span class="kn">from</span> <span class="nn">database</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">text</span>
+<span class="c1"># from flask_mail import Mail, Message</span>
+<span class="kn">from</span> <span class="nn">authlib.integrations.flask_client</span> <span class="kn">import</span> <span class="n">OAuth</span>
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">botocore.client</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">flask_socketio</span> <span class="kn">import</span> <span class="n">SocketIO</span><span class="p">,</span> <span class="n">emit</span><span class="p">,</span> <span class="n">join_room</span><span class="p">,</span> <span class="n">leave_room</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">static_folder</span><span class="o">=</span><span class="s1">&#39;frontend/build&#39;</span><span class="p">,</span> <span class="n">static_url_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">origins</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;http://localhost:5000&#39;</span><span class="p">,</span> <span class="s1">&#39;http://127.0.0.1:5000&#39;</span><span class="p">,</span> <span class="s1">&#39;https://aggies.house&#39;</span><span class="p">,</span> <span class="s1">&#39;https://aggieshouse-8782c141a8c4.herokuapp.com&#39;</span><span class="p">,</span> <span class="s1">&#39;https://www.aggies.house&#39;</span><span class="p">],</span> <span class="n">resources</span><span class="o">=</span><span class="p">{</span><span class="sa">r</span><span class="s2">&quot;/*&quot;</span><span class="p">:{</span><span class="s2">&quot;origins&quot;</span><span class="p">:</span><span class="s2">&quot;*&quot;</span><span class="p">}})</span>
+<span class="c1"># mail = Mail(app)</span>
+
+<span class="n">oauth</span> <span class="o">=</span> <span class="n">OAuth</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+<span class="n">oauth</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;google&#39;</span><span class="p">,</span>
+    <span class="n">client_id</span><span class="o">=</span>  <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;OAUTH_CLIENT_ID&#39;</span><span class="p">),</span>
+    <span class="n">client_secret</span><span class="o">=</span>  <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;OAUTH_CLIENT_SECRET&#39;</span><span class="p">),</span>
+    <span class="n">access_token_url</span><span class="o">=</span><span class="s1">&#39;https://accounts.google.com/o/oauth2/token&#39;</span><span class="p">,</span>
+    <span class="n">access_token_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">authorize_url</span><span class="o">=</span><span class="s1">&#39;https://accounts.google.com/o/oauth2/auth&#39;</span><span class="p">,</span>
+    <span class="n">authorize_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">api_base_url</span><span class="o">=</span><span class="s1">&#39;https://www.googleapis.com/oauth2/v1/&#39;</span><span class="p">,</span>
+    <span class="n">userinfo_endpoint</span><span class="o">=</span><span class="s1">&#39;https://openidconnect.googleapis.com/v1/userinfo&#39;</span><span class="p">,</span>  <span class="c1"># This is only needed if using openId to fetch user info</span>
+    <span class="n">client_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="s1">&#39;email profile&#39;</span><span class="p">},</span>
+    <span class="n">server_metadata_url</span><span class="o">=</span><span class="s1">&#39;https://accounts.google.com/.well-known/openid-configuration&#39;</span>
+<span class="p">)</span>
+
+<span class="n">socketio</span> <span class="o">=</span> <span class="n">SocketIO</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">cors_allowed_origin</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
+
+<span class="c1">#db setup</span>
+<span class="n">load_dotenv</span><span class="p">()</span> <span class="c1">#only needed for local?</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;production&#39;</span><span class="p">:</span>
+    <span class="n">database_uri</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;DATABASE_URL&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">database_uri</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;postgres://&quot;</span><span class="p">):</span>
+        <span class="n">database_uri</span> <span class="o">=</span> <span class="n">database_uri</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;postgres://&quot;</span><span class="p">,</span> <span class="s2">&quot;postgresql://&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">user</span><span class="p">,</span><span class="n">passwd</span><span class="p">,</span><span class="n">host</span><span class="p">,</span><span class="n">port</span><span class="p">,</span><span class="n">pgdb</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pguser&#39;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pgpass&#39;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pghost&#39;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pgport&#39;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;pgdb&#39;</span><span class="p">)</span>
+    <span class="n">database_uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;postgresql://</span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">passwd</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">pgdb</span><span class="si">}</span><span class="s2">&quot;</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">database_exists</span><span class="p">(</span><span class="n">database_uri</span><span class="p">):</span>
+        <span class="n">create_database</span><span class="p">(</span><span class="n">database_uri</span><span class="p">)</span>
+
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">database_uri</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_TRACK_MODIFICATIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">aws_access_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;AWS_ACCESS_KEY&#39;</span><span class="p">)</span>
+<span class="n">aws_secret_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;AWS_SECRET_KEY&#39;</span><span class="p">)</span>
+<span class="n">s3_bucket</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;S3_BUCKET&#39;</span><span class="p">)</span>
+<span class="n">aws_region</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;AWS_REGION&#39;</span><span class="p">)</span>
+
+<span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;s3&#39;</span><span class="p">,</span> <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">aws_access_key</span><span class="p">,</span> <span class="n">aws_secret_access_key</span> <span class="o">=</span> <span class="n">aws_secret_key</span><span class="p">,</span> <span class="n">region_name</span> <span class="o">=</span> <span class="n">aws_region</span><span class="p">,</span> <span class="n">endpoint_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://s3.</span><span class="si">{</span><span class="n">aws_region</span><span class="si">}</span><span class="s1">.amazonaws.com&#39;</span><span class="p">)</span>
+
+<span class="n">db</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;SECRET_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;default_secret_key&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">drop_all</span><span class="p">()</span> <span class="c1">#if you make changes to the db, you&#39;ll have to drop all tables if they have already been created before another change or we can use db migrations using alembic</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+
+    <span class="c1"># for test users</span>
+    <span class="kn">from</span> <span class="nn">testusers</span> <span class="kn">import</span> <span class="n">load_test_data</span>
+    <span class="k">if</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+       <span class="n">load_test_data</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+
+<span class="c1">#routes + bps</span>
+<div class="viewcode-block" id="index">
+<a class="viewcode-back" href="../run.html#run.index">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/login&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/login2&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/signup&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/feed&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/chat&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/settings&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/matches&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/questionnaire&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/complete_profile&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/questionnaire2&#39;</span><span class="p">)</span>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/imageupload&#39;</span><span class="p">)</span>
+<span class="nd">@cross_origin</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">static_folder</span><span class="p">,</span> <span class="s1">&#39;index.html&#39;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># @socketio.on(&quot;connect&quot;)</span>
+<span class="c1"># def connected():</span>
+<span class="c1">#     &quot;&quot;&quot;event listener when client connects to the server&quot;&quot;&quot;</span>
+<span class="c1">#     print(request.sid)</span>
+<span class="c1">#     print(&quot;client has connected&quot;)</span>
+<span class="c1">#     emit(&quot;userConnected&quot;,{&quot;data&quot;:f&quot;id: {request.sid} is connected&quot;})</span>
+
+
+<span class="c1"># @socketio.on(&quot;connect&quot;)</span>
+<span class="c1"># def connected(matches):</span>
+<span class="c1">#     &quot;&quot;&quot;Event listener when client connects to the server&quot;&quot;&quot;</span>
+<span class="c1">#     print(request.sid)</span>
+<span class="c1">#     print(&quot;Client has connected&quot;)</span>
+<span class="c1">#     emit(&quot;userConnected&quot;, {&quot;data&quot;: f&quot;id: {request.sid} is connected&quot;})</span>
+
+<span class="c1">#     # Fetch matches from the server</span>
+<span class="c1">#     #matches_response = axios.get(&#39;http://your-api-url/getmatches&#39;)</span>
+<span class="c1">#     #matches = matches.json().get(&#39;matches&#39;, [])</span>
+
+<span class="c1">#     # Emit matches to the connected client</span>
+<span class="c1">#     emit(&quot;matches&quot;, matches)</span>
+
+<span class="c1">#     # Establish socket connections between matched users</span>
+<span class="c1">#     for match in matches:</span>
+<span class="c1">#         # Check if the current user matches with this match</span>
+<span class="c1">#         #if match.get(&#39;user_id&#39;) == request.sid:  # Example logic to check match</span>
+<span class="c1">#             # Get the socket ID of the matched user</span>
+<span class="c1">#             matched_socket_id = match.user_id  # Replace with actual logic to get socket ID</span>
+
+<span class="c1">#             # Establish socket connection with the matched user</span>
+<span class="c1">#             emit(&quot;matchedConnection&quot;, {&quot;userId&quot;: request.sid}, room=matched_socket_id)</span>
+
+<span class="c1"># @socketio.on(&#39;joinRoom&#39;)</span>
+<span class="c1"># def join_room_event(roomId):</span>
+<span class="c1">#     join_room(roomId)</span>
+<span class="c1">#     print(f&quot;User joined room {roomId}&quot;)</span>
+
+<span class="c1"># @socketio.on(&#39;leaveRoom&#39;)</span>
+<span class="c1"># def leave_room_event(roomId):</span>
+<span class="c1">#     leave_room(roomId)</span>
+<span class="c1">#     print(f&quot;User left room {roomId}&quot;)</span>
+
+<span class="c1"># @socketio.on(&#39;joinRoom&#39;)</span>
+<span class="c1"># def join_room_event(data):</span>
+<span class="c1">#     &quot;&quot;&quot;Event listener to join a specific room&quot;&quot;&quot;</span>
+<span class="c1">#     room_name = str(data)</span>
+<span class="c1">#     if room_name:</span>
+<span class="c1">#         join_room(room_name)</span>
+<span class="c1">#         print(&quot;join room from the front end: &quot;,str(data))</span>
+<span class="c1">#         emit(&quot;roomJoined&quot;, {&quot;data&quot;: f&quot;You have joined room: {room_name}&quot;})</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         emit(&quot;joinRoomError&quot;, {&quot;error&quot;: &quot;Invalid room name&quot;})</span>
+
+<span class="c1"># @socketio.on(&quot;joinRoom&quot;)</span>
+<span class="c1"># def handle_join_room(data):</span>
+<span class="c1">#     user_id = data.get(&quot;userId&quot;)</span>
+<span class="c1">#     room_id = f&quot;room_{user_id}&quot;</span>
+<span class="c1">#     print(f&quot;User {user_id} joined room {room_id}&quot;)</span>
+<span class="c1">#     join_room(room_id)</span>
+
+<span class="c1"># @socketio.on(&quot;data&quot;)</span>
+<span class="c1"># def handle_data(data):</span>
+<span class="c1">#     print(&quot;data: &quot;, str(data))</span>
+<span class="c1">#     user_id = data.get(&quot;userId&quot;)</span>
+<span class="c1">#     room_id = f&quot;room_{user_id}&quot;</span>
+<span class="c1">#     print(&quot;Received data in room: &quot;, str(room_id))</span>
+<span class="c1">#     emit(&quot;data&quot;, data, room=room_id, include_self=False)</span>
+
+<span class="c1"># @socketio.on(&#39;data&#39;)</span>
+<span class="c1"># def handle_message(data):</span>
+<span class="c1">#     &quot;&quot;&quot;event listener when client types a message&quot;&quot;&quot;</span>
+<span class="c1">#     print(&quot;data from the front end: &quot;,str(data))</span>
+<span class="c1">#     emit(&quot;data&quot;,{&#39;data&#39;:data,&#39;id&#39;:request.sid},broadcast=True)</span>
+    
+
+<span class="c1"># @socketio.on(&quot;disconnect&quot;)</span>
+<span class="c1"># def disconnected():</span>
+<span class="c1">#     &quot;&quot;&quot;event listener when client disconnects to the server&quot;&quot;&quot;</span>
+<span class="c1">#     print(&quot;user disconnected&quot;)</span>
+<span class="c1">#     emit(&quot;disconnect&quot;,f&quot;user {request.sid} disconnected&quot;,broadcast=True)</span>
+
+
+<span class="c1"># from flask_app.routes.login.routes import *</span>
+<span class="c1"># app.register_blueprint(login_bp)</span>
+
+<span class="c1"># from flask_app.routes.feed.routes import *</span>
+<span class="c1"># app.register_blueprint(feed_bp)</span>
+
+<span class="c1"># from flask_app.routes.chat.routes import *</span>
+<span class="c1"># app.register_blueprint(chat_bp)</span>
+
+<span class="c1"># from flask_app.routes.questionnaire.routes import *</span>
+<span class="c1"># app.register_blueprint(question_bp)</span>
+
+<span class="c1"># from flask_app.routes.settings.routes import *</span>
+<span class="c1"># app.register_blueprint(settings_bp)</span>
+
+<span class="c1"># from flask_app.routes.matches.routes import *</span>
+<span class="c1"># app.register_blueprint(matches_bp)</span>
+
+<span class="c1"># # app.config[&#39;MAIL_SERVER&#39;] = &#39;smtp.fastmail.com&#39;</span>
+<span class="c1"># # app.config[&#39;MAIL_PORT&#39;] = 465</span>
+<span class="c1"># # app.config[&#39;MAIL_USE_SSL&#39;] = True</span>
+<span class="c1"># # app.config[&#39;MAIL_USE_TLS&#39;] = False</span>
+<span class="c1"># # app.config[&#39;MAIL_USERNAME&#39;] = &#39;aggieshouse@fastmail.com&#39;</span>
+<span class="c1"># # app.config[&#39;MAIL_PASSWORD&#39;] = &#39;wr2grs44gtleuygf&#39;</span>
+<span class="c1"># # app.config[&#39;MAIL_DEBUG&#39;] = True</span>
+
+<span class="c1"># from flask_app.routes.images.routes import *</span>
+<span class="c1"># app.register_blueprint(image_bp)</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;development&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="serve_test_image">
+<a class="viewcode-back" href="../run.html#run.serve_test_image">[docs]</a>
+    <span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/test_images/&lt;path:filename&gt;&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">serve_test_image</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Serve files from the test_images directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">send_from_directory</span><span class="p">(</span><span class="s1">&#39;test_images&#39;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+
+    
+<span class="c1"># Define your Chat Engine API endpoint and private key</span>
+<span class="n">chat_engine_url</span> <span class="o">=</span> <span class="s1">&#39;https://api.chatengine.io/users/&#39;</span>
+<span class="n">chat_engine_private_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;CHAT_ENGINE_PRIVATE_KEY&#39;</span><span class="p">)</span>  <span class="c1"># Replace with your Chat Engine private key</span>
+
+<div class="viewcode-block" id="migrate_existing_users_to_chat_engine">
+<a class="viewcode-back" href="../run.html#run.migrate_existing_users_to_chat_engine">[docs]</a>
+<span class="k">def</span> <span class="nf">migrate_existing_users_to_chat_engine</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Migrates existing users to Chat Engine.</span>
+
+<span class="sd">    :return: tuple</span>
+<span class="sd">        A tuple containing lists of new users migrated to Chat Engine and failed users.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>  <span class="c1"># Ensure execution within Flask app context</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>  <span class="c1"># Get all existing users from your database</span>
+
+        <span class="n">new_users</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">failed_users</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+            <span class="n">chat_engine_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>  <span class="c1"># Using email as username for simplicity, you can adjust this as needed</span>
+                <span class="s2">&quot;secret&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>  <span class="c1"># Using password as secret for simplicity, ensure it&#39;s secure in production</span>
+                <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                <span class="s2">&quot;first_name&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+                <span class="c1"># Add other fields as needed</span>
+            <span class="p">}</span>
+
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;PRIVATE-KEY&#39;</span><span class="p">:</span> <span class="n">chat_engine_private_key</span><span class="p">}</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">chat_engine_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">chat_engine_data</span><span class="p">)</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>  <span class="c1"># Raise exception if request fails</span>
+
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">201</span><span class="p">:</span>
+                    <span class="n">new_users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">failed_users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+            <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">failed_users</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">})</span>  <span class="c1"># Add user ID for reference in case of failure</span>
+
+        <span class="k">return</span> <span class="n">new_users</span><span class="p">,</span> <span class="n">failed_users</span></div>
+
+
+<span class="c1"># Example usage</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">new_users</span><span class="p">,</span> <span class="n">failed_users</span> <span class="o">=</span> <span class="n">migrate_existing_users_to_chat_engine</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;New users migrated to Chat Engine:&#39;</span><span class="p">,</span> <span class="n">new_users</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failed users:&#39;</span><span class="p">,</span> <span class="n">failed_users</span><span class="p">)</span>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">run</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Hunter Zacha, Michelle Nguyen, Navya Mittal, Harini Kumar.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>

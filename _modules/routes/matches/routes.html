@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>routes.matches.routes &#8212; Aggie&#39;s House  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/classic.css?v=def86cc0" />
+    
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">routes.matches.routes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for routes.matches.routes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Endpoints used for the matches page</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">jsonify</span><span class="p">,</span> <span class="n">session</span>
+<span class="kn">from</span> <span class="nn">database</span> <span class="kn">import</span> <span class="n">db</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">Like</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">aliased</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="c1"># from run import s3, s3_bucket, aws_region</span>
+
+<span class="n">matches_bp</span> <span class="o">=</span> <span class="n">Blueprint</span><span class="p">(</span><span class="s1">&#39;matches&#39;</span><span class="p">,</span> <span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="getmatches">
+<a class="viewcode-back" href="../../../routes.matches.html#routes.matches.routes.getmatches">[docs]</a>
+<span class="nd">@matches_bp</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/getmatches&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">getmatches</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get matches for the current user.</span>
+
+<span class="sd">    :return: Response</span>
+<span class="sd">        A JSON response containing information about the matches.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_user_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">current_user_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;User not authenticated&#39;</span><span class="p">}),</span> <span class="mi">401</span>
+
+    <span class="c1"># Create an alias for the Like model since we join on the same table</span>
+    <span class="n">LikeAlias</span> <span class="o">=</span> <span class="n">aliased</span><span class="p">(</span><span class="n">Like</span><span class="p">)</span>
+
+    <span class="c1"># Query to find all the current user&#39;s likes that also like them back (a match for the current user)</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="n">Like</span><span class="o">.</span><span class="n">query</span>\
+        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">LikeAlias</span><span class="p">,</span> <span class="n">Like</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">LikeAlias</span><span class="o">.</span><span class="n">liked_user_id</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Like</span><span class="o">.</span><span class="n">liked_user_id</span> <span class="o">==</span> <span class="n">LikeAlias</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Like</span><span class="o">.</span><span class="n">liked</span> <span class="o">==</span> <span class="kc">True</span><span class="p">,</span> <span class="n">LikeAlias</span><span class="o">.</span><span class="n">liked</span> <span class="o">==</span> <span class="kc">True</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Like</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">current_user_id</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="c1"># Prepare match data to send to the frontend</span>
+    <span class="n">match_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">like</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">like</span><span class="o">.</span><span class="n">liked_user_id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+        <span class="c1">#generate presigned link if in prod</span>
+        <span class="n">profile_photo</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">profile_photo</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;production&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">profile_photo</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;aggies_house_&#39;</span><span class="p">):</span>
+                <span class="n">s3_link</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">generate_presigned_url</span><span class="p">(</span>
+                    <span class="s1">&#39;get_object&#39;</span><span class="p">,</span>
+                    <span class="n">Params</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Bucket&#39;</span><span class="p">:</span> <span class="n">s3_bucket</span><span class="p">,</span> <span class="s1">&#39;Key&#39;</span><span class="p">:</span> <span class="n">profile_photo</span><span class="p">},</span>
+                    <span class="n">ExpiresIn</span><span class="o">=</span><span class="mi">300</span>  <span class="c1"># URL expires in 1 hour</span>
+                <span class="p">)</span>
+                <span class="n">profile_photo</span> <span class="o">=</span> <span class="n">s3_link</span>
+
+        <span class="n">match_info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="n">match</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="n">match</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+            <span class="s1">&#39;major&#39;</span><span class="p">:</span> <span class="n">match</span><span class="o">.</span><span class="n">major</span><span class="p">,</span>
+            <span class="s1">&#39;profile_photo&#39;</span><span class="p">:</span> <span class="n">profile_photo</span><span class="p">,</span>  <span class="c1"># Assuming profile_photo is a URL</span>
+            <span class="c1"># Add more fields as needed</span>
+            <span class="s1">&#39;email&#39;</span> <span class="p">:</span> <span class="n">match</span><span class="o">.</span><span class="n">email</span>
+        <span class="p">}</span>
+        <span class="n">match_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_info</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;matches&#39;</span><span class="p">:</span> <span class="n">match_data</span><span class="p">}),</span> <span class="mi">200</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Aggie&#39;s House  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">routes.matches.routes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Aggie&#39;s House Team.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    </div>
+  </body>
+</html>
